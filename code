@@ -1,0 +1,42 @@
+class Solution {
+public:
+    vector<int> constructDistancedSequence(int n) {
+        int size = 2 * n - 1;
+        vector<int> result(size, 0); // Initialize the sequence with 0s
+        vector<bool> used(n + 1, false); // Track used numbers
+        
+        function<bool(int)> backtrack = [&](int idx) {
+            if (idx == size) return true; // Base case: if filled, return true
+            
+            if (result[idx] != 0) return backtrack(idx + 1); // Skip filled positions
+            
+            // Try placing numbers from largest to smallest
+            for (int num = n; num >= 1; --num) {
+                if (used[num]) continue; // If already used, skip
+                
+                if (num == 1) { // Special case for 1 (only appears once)
+                    result[idx] = 1;
+                    used[1] = true;
+                    if (backtrack(idx + 1)) return true;
+                    result[idx] = 0;
+                    used[1] = false;
+                } 
+                else if (idx + num < size && result[idx + num] == 0) {
+                    // If num can be placed at idx and idx+num
+                    result[idx] = result[idx + num] = num;
+                    used[num] = true;
+                    
+                    if (backtrack(idx + 1)) return true;
+                    
+                    // Backtrack
+                    result[idx] = result[idx + num] = 0;
+                    used[num] = false;
+                }
+            }
+            return false;
+        };
+
+        backtrack(0);
+        return result;
+    }
+};
